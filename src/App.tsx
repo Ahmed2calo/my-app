@@ -1,14 +1,7 @@
-import Quote from "./Quote"
-import ToDoList from "./assets/ToDoList"
-import Color
- from "./assets/Color"
+import Quote from "./Quote";
 
 function App() {
- 
-
-  return (
-   <Quote></Quote>
-  )
+  return <Quote />;
 }
 
-export default App
+export default App;

@@ -29,13 +29,6 @@ function Quote() {
       });
   }, []);
 
-  useEffect(() => {
-  if (currentQuote && currentQuote.tags) {
-    console.log("Tags:", currentQuote.tags.join(" "));
-  }
-}, [currentQuote]);
-
-
   // Pick a random quote
   function getNewQuote() {
     if (quotes.length === 0) return;
@@ -62,15 +55,15 @@ function Quote() {
           {currentQuote ? `— ${currentQuote.author}` : "—"}
         </p>
         <p>
-  {currentQuote
-    ? currentQuote.tags.map((tag, index) => (
-        <span key={index} className="mr-2">
-          {tag}
-        </span>
-      ))
-    : "wait the tag"}
-</p>
-<br></br>
+          {currentQuote
+            ? currentQuote.tags.map((tag, index) => (
+                <span key={index} className="mr-2">
+                  {tag}
+                </span>
+              ))
+            : "wait the tag"}
+        </p>
+        <br></br>
         <div className="flex justify-center gap-4">
           <button
             onClick={getNewQuote}
@@ -84,8 +77,6 @@ function Quote() {
           >
             Copy
           </button>
-
-        
         </div>
       </div>
     </div>
