@@ -53,7 +53,7 @@ function Quote() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-pink-500">
+    <div className="flex items-center justify-center min-h-screen bg-red-500">
       <div className="bg-white shadow-lg p-6 rounded-lg max-w-xl w-full text-center">
         <p className="text-xl font-semibold mb-2">
           {currentQuote ? currentQuote.quote : "Loading quote..."}
