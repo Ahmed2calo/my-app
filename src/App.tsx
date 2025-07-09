@@ -1,7 +1,6 @@
-import Quote from "./Quote";
-
+import Movie from "./Movie";
 function App() {
-  return <Quote />;
+  return < Movie/>;
 }
 
 export default App;
