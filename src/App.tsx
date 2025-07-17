@@ -1,13 +1,12 @@
-import Movie from "./Movie"
+import Movie from "./Movie";
 
 function App() {
- 
-
   return (
-
-
-    <Movie></Movie>
-  )
+    <>
+      <Movie />
+      <Movie />
+    </>
+  );
 }
 
-export default App
+export default App;
