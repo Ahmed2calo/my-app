@@ -45,8 +45,8 @@ export default function ActorDetailsPage() {
         setActor(actorRes.data);
         setMovies(creditsRes.data.cast || []);
       } catch (error) {
-        console.error("❌ Failed to fetch actor:", error.response || error.message || error);
-        setActor(null);
+       
+        setActor(null);  
       } finally {
         setLoading(false);
       }
@@ -65,7 +65,6 @@ export default function ActorDetailsPage() {
 
   return (
     <div className="p-4 max-w-6xl mx-auto text-white">
-      
       <div className="flex flex-col md:flex-row gap-6 mb-8">
         <div className="w-full md:w-1/3">
           {actor.profile_path ? (
