@@ -96,41 +96,38 @@ function MoviePage() {
   }, []);
 
   const renderMovieList = (movies: Movie[]) => (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-    {movies.map((movie) => (
-      <Link to={`/movie/${movie.id}`} key={movie.id}>
-        <div className="bg-white rounded shadow p-2 text-center hover:shadow-lg h-full flex flex-col">
-          {movie.poster_path ? (
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-              alt={movie.title}
-              className="w-full h-64 object-cover rounded"
-            />
-          ) : (
-            <div className="bg-gray-300 h-64 flex items-center justify-center rounded">
-              No Image
-            </div>
-          )}
-          <h3 className="font-semibold text-sm mt-2 truncate">{movie.title}</h3>
-          <p className="text-xs text-gray-600">{movie.release_date}</p>
-        </div>
-      </Link>
-    ))}
-  </div>
-);
-
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      {movies.map((movie) => (
+        <Link to={`/movie/${movie.id}`} key={movie.id}>
+          <div className="bg-white rounded-lg shadow-lg p-4 text-center hover:shadow-xl h-full flex flex-col">
+            {movie.poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+                className="w-full h-96 object-cover rounded-lg mb-4"
+              />
+            ) : (
+              <div className="bg-gray-300 h-96 flex items-center justify-center rounded-lg mb-4">
+                No Image
+              </div>
+            )}
+            <h3 className="font-semibold text-lg mt-2 text-gray-800 truncate">
+              {movie.title}
+            </h3>
+            <p className="text-sm text-gray-600">{movie.release_date}</p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 flex flex-col items-center p-6">
       <Navbar />
 
-      <h1 className="text-3xl md:text-4xl font-bold text-blue-700 mb-6">
-        🎬 Movie Search App
-      </h1>
-
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col sm:flex-row gap-3 w-full max-w-md mb-4"
+        className="flex flex-col sm:flex-row gap-3 w-full max-w-md mb-4 mt-12"
       >
         <input
           type="text"
@@ -157,7 +154,9 @@ function MoviePage() {
       </form>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
-      {loading && <p className="text-blue-700 mb-4 animate-pulse">Loading...</p>}
+      {loading && (
+        <p className="text-blue-700 mb-4 animate-pulse">Loading...</p>
+      )}
 
       {isSearching ? (
         <section className="w-full max-w-6xl mb-12">
@@ -173,14 +172,12 @@ function MoviePage() {
       ) : (
         <>
           <section className="w-full max-w-6xl mb-12">
-            <h2 className="text-2xl font-bold mb-4 text-blue-800">
-            </h2>
+            <h2 className="text-2xl font-bold mb-4 text-blue-800"></h2>
             <MovieCarousel movies={topRatedMovies} title="Top Rated Movies" />
           </section>
 
           <section className="w-full max-w-6xl">
-            <h2 className="text-2xl font-bold mb-4 text-blue-800">
-            </h2>
+            <h2 className="text-2xl font-bold mb-4 text-blue-800"></h2>
             <MovieCarousel movies={upcomingMovies} title="Upcoming Movies" />
           </section>
         </>

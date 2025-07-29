@@ -26,25 +26,26 @@ type MovieCredit = {
 
 export default function ActorDetailsPage() {
   const { id } = useParams();
+  const actorId = id ? Number(id) : null;
   const [actor, setActor] = useState<Actor | null>(null);
   const [movies, setMovies] = useState<MovieCredit[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    if (!actorId) return;
 
     const fetchActorDetails = async () => {
       setLoading(true);
       try {
         const [actorRes, creditsRes] = await Promise.all([
-          axios.get(`${BASE_URL}/person/${id}?api_key=${API_KEY}`),
-          axios.get(`${BASE_URL}/person/${id}/movie_credits?api_key=${API_KEY}`),
+          axios.get(`${BASE_URL}/person/${actorId}?api_key=${API_KEY}`),
+          axios.get(`${BASE_URL}/person/${actorId}/movie_credits?api_key=${API_KEY}`),
         ]);
 
         setActor(actorRes.data);
         setMovies(creditsRes.data.cast || []);
       } catch (error) {
-        console.error("❌ Failed to fetch actor:", error);
+        console.error("❌ Failed to fetch actor:", error.response || error.message || error);
         setActor(null);
       } finally {
         setLoading(false);
@@ -52,7 +53,7 @@ export default function ActorDetailsPage() {
     };
 
     fetchActorDetails();
-  }, [id]); // ✅ VERY IMPORTANT!
+  }, [actorId]);
 
   if (loading) {
     return <div className="text-white text-center py-10">Loading actor details...</div>;
@@ -64,7 +65,7 @@ export default function ActorDetailsPage() {
 
   return (
     <div className="p-4 max-w-6xl mx-auto text-white">
-      {/* Actor Profile */}
+      
       <div className="flex flex-col md:flex-row gap-6 mb-8">
         <div className="w-full md:w-1/3">
           {actor.profile_path ? (
@@ -104,7 +105,6 @@ export default function ActorDetailsPage() {
         </div>
       </div>
 
-      {/* Movie Credits */}
       <div className="mt-10">
         <h2 className="text-2xl font-semibold mb-4">🎬 Known For</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -143,4 +143,3 @@ export default function ActorDetailsPage() {
     </div>
   );
 }
- 

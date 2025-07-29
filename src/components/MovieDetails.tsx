@@ -101,7 +101,6 @@ function MovieDetails() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-white">
-      {/* Poster and Title */}
       {movie.poster_path ? (
         <img
           src={`${IMAGE_URL}${movie.poster_path}`}
@@ -116,7 +115,6 @@ function MovieDetails() {
 
       <h1 className="text-3xl font-bold mb-4 text-center">{movie.title}</h1>
 
-      {/* Description */}
       <p className="bg-gray-900/80 p-4 rounded-md text-gray-100 font-semibold text-lg mb-8 max-w-3xl mx-auto text-center">
         {movie.overview}
       </p>
@@ -136,7 +134,6 @@ function MovieDetails() {
         </div>
       )}
 
-      {/* Cast */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4">👥 Cast</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -166,7 +163,7 @@ function MovieDetails() {
         </div>
       </div>
 
-      {/* Recommendations */}
+     
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4">🎥 Recommendations</h2>
         {recommendations.length === 0 ? (
@@ -199,7 +196,6 @@ function MovieDetails() {
         )}
       </div>
 
-      {/* Reviews */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4 text-white">📝 Reviews</h2>
         {reviews.length === 0 ? (

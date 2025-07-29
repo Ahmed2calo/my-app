@@ -9,7 +9,6 @@ const SearchResults = () => {
       <h1 className="text-2xl font-bold mb-4">
         Search Results for "{query}"
       </h1>
-      {/* Add your search results rendering here */}
     </div>
   );
 };
