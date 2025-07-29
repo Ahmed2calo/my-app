@@ -8,8 +8,10 @@ const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 
 type MovieDetailsType = {
   title: string;
+  name?: string;  // TV Series name
   poster_path: string | null;
   overview: string;
+  media_type: string; // movie or tv
 };
 
 type CastType = {
@@ -28,6 +30,7 @@ type ReviewType = {
 type RecommendationType = {
   id: number;
   title: string;
+  name: string;
   poster_path: string | null;
 };
 
@@ -57,7 +60,7 @@ function ReviewCard({ review }: { review: ReviewType }) {
 }
 
 function MovieDetails() {
-  const { id } = useParams();
+  const { id, media_type } = useParams();  // Get media_type from route
   const [movie, setMovie] = useState<MovieDetailsType | null>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [cast, setCast] = useState<CastType[]>([]);
@@ -66,17 +69,20 @@ function MovieDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchMovieDetails() {
+    async function fetchDetails() {
       try {
-        const [movieRes, videosRes, creditsRes, reviewsRes, recRes] = await Promise.all([
-          axios.get(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`),
-          axios.get(`${BASE_URL}/movie/${id}/videos?api_key=${API_KEY}`),
-          axios.get(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`),
-          axios.get(`${BASE_URL}/movie/${id}/reviews?api_key=${API_KEY}`),
-          axios.get(`${BASE_URL}/movie/${id}/recommendations?api_key=${API_KEY}`),
+        // Dynamically fetch movie or TV show based on the media_type
+        const currentMediaType = media_type || (id?.startsWith("movie") ? "movie" : "tv");
+
+        const [detailsRes, videosRes, creditsRes, reviewsRes, recRes] = await Promise.all([
+          axios.get(`${BASE_URL}/${currentMediaType}/${id}?api_key=${API_KEY}`),
+          axios.get(`${BASE_URL}/${currentMediaType}/${id}/videos?api_key=${API_KEY}`),
+          axios.get(`${BASE_URL}/${currentMediaType}/${id}/credits?api_key=${API_KEY}`),
+          axios.get(`${BASE_URL}/${currentMediaType}/${id}/reviews?api_key=${API_KEY}`),
+          axios.get(`${BASE_URL}/${currentMediaType}/${id}/recommendations?api_key=${API_KEY}`),
         ]);
 
-        setMovie(movieRes.data);
+        setMovie(detailsRes.data);
 
         const trailer = videosRes.data.results.find(
           (vid: any) => vid.type === "Trailer" && vid.site === "YouTube"
@@ -87,24 +93,24 @@ function MovieDetails() {
         setReviews(reviewsRes.data.results);
         setRecommendations(recRes.data.results.slice(0, 8));
       } catch (err) {
-        console.error("Error fetching movie details:", err);
+        console.error("Error fetching details:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchMovieDetails();
-  }, [id]);
+    fetchDetails();
+  }, [id, media_type]);
 
   if (loading) return <p className="text-center mt-10 text-white">Loading...</p>;
-  if (!movie) return <p className="text-center mt-10 text-white">Movie not found.</p>;
+  if (!movie) return <p className="text-center mt-10 text-white">Details not found.</p>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-white">
       {movie.poster_path ? (
         <img
           src={`${IMAGE_URL}${movie.poster_path}`}
-          alt={movie.title}
+          alt={movie.title || movie.name}
           className="w-full md:w-96 rounded-lg shadow mx-auto mb-4"
         />
       ) : (
@@ -113,7 +119,7 @@ function MovieDetails() {
         </div>
       )}
 
-      <h1 className="text-3xl font-bold mb-4 text-center">{movie.title}</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">{movie.title || movie.name}</h1>
 
       <p className="bg-gray-900/80 p-4 rounded-md text-gray-100 font-semibold text-lg mb-8 max-w-3xl mx-auto text-center">
         {movie.overview}
@@ -126,7 +132,7 @@ function MovieDetails() {
           <div className="relative" style={{ paddingTop: "56.25%" }}>
             <iframe
               src={`https://www.youtube.com/embed/${trailerKey}`}
-              title="Movie Trailer"
+              title="Trailer"
               className="absolute top-0 left-0 w-full h-full rounded-lg shadow"
               allowFullScreen
             ></iframe>
@@ -134,6 +140,7 @@ function MovieDetails() {
         </div>
       )}
 
+      {/* Cast */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4">👥 Cast</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -163,7 +170,7 @@ function MovieDetails() {
         </div>
       </div>
 
-     
+      {/* Recommendations */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4">🎥 Recommendations</h2>
         {recommendations.length === 0 ? (
@@ -173,13 +180,13 @@ function MovieDetails() {
             {recommendations.map((rec) => (
               <Link
                 key={rec.id}
-                to={`/movie/${rec.id}`}
+                to={`/${rec.title ? 'movie' : 'tv'}/${rec.id}`}  // Dynamic path based on media_type
                 className="block bg-gray-800 rounded-lg shadow overflow-hidden text-center hover:scale-105 transition-transform"
               >
                 {rec.poster_path ? (
                   <img
                     src={`${IMAGE_URL}${rec.poster_path}`}
-                    alt={rec.title}
+                    alt={rec.title || rec.name}
                     className="w-full h-48 object-cover"
                   />
                 ) : (
@@ -188,7 +195,7 @@ function MovieDetails() {
                   </div>
                 )}
                 <div className="p-2">
-                  <p className="text-sm font-semibold truncate">{rec.title}</p>
+                  <p className="text-sm font-semibold truncate">{rec.title || rec.name}</p>
                 </div>
               </Link>
             ))}
@@ -196,6 +203,7 @@ function MovieDetails() {
         )}
       </div>
 
+      {/* Reviews */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4 text-white">📝 Reviews</h2>
         {reviews.length === 0 ? (

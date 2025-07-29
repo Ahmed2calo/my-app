@@ -1,26 +1,26 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Layout from "./Layout";  
-import MoviePage from "./pages/MoviePage";  
-import MovieDetails from "./components/MovieDetails"; 
-import ActorDetailsPage from "./pages/ActorDetailPage";  
-import SearchResults from "./components/SearchResults";  
+import Layout from "./Layout";
+import MoviePage from "./pages/MoviePage";
+import MovieDetails from "./components/MovieDetails";
+import ActorDetailsPage from "./pages/ActorDetailPage";
+import SearchResults from "./components/SearchResults";
 
 function App() {
   return (
     <Router>
       <Routes>
-        
         <Route path="/" element={<Layout />}>
-          
+          {/* Home page */}
           <Route index element={<MoviePage />} />
 
-          
+          {/* Movie and TV details */}
           <Route path="movie/:id" element={<MovieDetails />} />
+          <Route path="tv/:id" element={<MovieDetails />} />
 
-          
+          {/* Actor details */}
           <Route path="actor/:id" element={<ActorDetailsPage />} />
 
-          
+          {/* Search results */}
           <Route path="search" element={<SearchResults />} />
         </Route>
       </Routes>
