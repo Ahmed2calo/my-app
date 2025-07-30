@@ -12,14 +12,14 @@ function App() {
         <Route path="/" element={<Layout />}>
           {/* Home page */}
           <Route index element={<MoviePage />} />
-
+          
           {/* Movie and TV details */}
-          <Route path="movie/:id" element={<MovieDetails />} />
+          <Route path="movie/:id" element={<MovieDetails  />} />
           <Route path="tv/:id" element={<MovieDetails />} />
-
+          
           {/* Actor details */}
           <Route path="actor/:id" element={<ActorDetailsPage />} />
-
+          
           {/* Search results */}
           <Route path="search" element={<SearchResults />} />
         </Route>

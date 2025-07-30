@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -22,23 +22,22 @@ type TVShow = {
 
 function MoviePage() {
   const [query, setQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<"movie" | "tv" | "all">("all");
   const [error, setError] = useState("");
   const [topRatedMovies, setTopRatedMovies] = useState<Movie[]>([]);
   const [topRatedTVShows, setTopRatedTVShows] = useState<TVShow[]>([]);
   const [upcomingMovies, setUpcomingMovies] = useState<Movie[]>([]);
   const [upcomingTVShows, setUpcomingTVShows] = useState<TVShow[]>([]);
-  const [searchResultsMovies, setSearchResultsMovies] = useState<Movie[]>([]);
-  const [searchResultsTVShows, setSearchResultsTVShows] = useState<TVShow[]>([]);
   const [loading, setLoading] = useState({ topRated: false, upcoming: false, search: false });
-  const [isSearching, setIsSearching] = useState(false);
-
-  // Carousel state for navigation
   const [topRatedMoviesSlide, setTopRatedMoviesSlide] = useState(0);
   const [topRatedTVShowsSlide, setTopRatedTVShowsSlide] = useState(0);
   const [upcomingMoviesSlide, setUpcomingMoviesSlide] = useState(0);
   const [upcomingTVShowsSlide, setUpcomingTVShowsSlide] = useState(0);
 
   const MOVIES_PER_SLIDE = 4; // 4 items per slide
+
+
+
 
   // Reusable function to fetch data
   const fetchData = async (endpoint: string, setState: React.Dispatch<React.SetStateAction<any[]>>, key: string) => {
@@ -70,46 +69,6 @@ function MoviePage() {
     ]);
   };
 
-  const searchMoviesAndTVShows = async () => {
-    if (!query.trim()) {
-      setError("Please enter a search term.");
-      return;
-    }
-
-    setLoading((prev) => ({ ...prev, search: true }));
-    setError("");
-    setIsSearching(true);
-
-    try {
-      const result = await axios.get(
-        `${TMDB_BASE_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1`
-      );
-      const movies = result.data.results.filter((item: any) => item.media_type === "movie");
-      const tvShows = result.data.results.filter((item: any) => item.media_type === "tv");
-
-      setSearchResultsMovies(movies);
-      setSearchResultsTVShows(tvShows);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to search movies and TV shows.");
-    } finally {
-      setLoading((prev) => ({ ...prev, search: false }));
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    searchMoviesAndTVShows();
-  };
-
-  const clearSearch = () => {
-    setQuery("");
-    setIsSearching(false);
-    setSearchResultsMovies([]);
-    setSearchResultsTVShows([]);
-    setError("");
-  };
-
   useEffect(() => {
     fetchTopRated();
     fetchUpcoming();
@@ -119,6 +78,10 @@ function MoviePage() {
   const getCarouselItems = (items: any[], slideIndex: number) => {
     return items.slice(slideIndex * MOVIES_PER_SLIDE, (slideIndex + 1) * MOVIES_PER_SLIDE);
   };
+
+
+
+
 
   const renderMovieList = (movies: Movie[], slideIndex: number) => (
     <div className="flex overflow-x-auto space-x-6">
@@ -144,6 +107,10 @@ function MoviePage() {
     </div>
   );
 
+
+
+
+
   const renderTVShowList = (tvShows: TVShow[], slideIndex: number) => (
     <div className="flex overflow-x-auto space-x-6">
       {getCarouselItems(tvShows, slideIndex).map((tvShow) => (
@@ -168,115 +135,119 @@ function MoviePage() {
     </div>
   );
 
+  const handleSearch = () => {
+    // Handle the search query
+    console.log(query);
+    
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 flex flex-col items-center p-6">
       <Navbar />
 
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col sm:flex-row gap-3 w-full max-w-md mb-4 mt-12"
-      >
+      {/* Search Bar Section */}
+      <div className="w-full max-w-md mb-6">
         <input
           type="text"
-          placeholder="Enter movie or TV show name..."
+          placeholder="Search for Movies or TV Shows"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-4 py-3 transition"
+          onClick={handleSearch}
+          className="w-full mt-2 bg-blue-500 text-white py-3 rounded-lg shadow-md hover:bg-blue-600 transition-all"
         >
           Search
         </button>
-        {isSearching && (
-          <button
-            type="button"
-            onClick={clearSearch}
-            className="bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg px-4 py-3 transition"
-          >
-            Clear
-          </button>
-        )}
-      </form>
+      </div>
 
-      {error && <p className="text-red-600 mb-4">{error}</p>}
+      {/* Category Buttons Section */}
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => setSelectedCategory("movie")}
+          className={`px-4 py-2 rounded ${selectedCategory === "movie" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+        >
+          Movies
+        </button>
+        <button
+          onClick={() => setSelectedCategory("tv")}
+          className={`px-4 py-2 rounded ${selectedCategory === "tv" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+        >
+          TV Shows
+        </button>
+        <button
+          onClick={() => setSelectedCategory("all")}
+          className={`px-4 py-2 rounded ${selectedCategory === "all" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+        >
+          All
+        </button>
+      </div>
 
-      {loading.search && <p className="text-blue-700 mb-4 animate-pulse">Loading search results...</p>}
-      {loading.topRated && <p className="text-blue-700 mb-4 animate-pulse">Loading top rated movies and TV shows...</p>}
-      {loading.upcoming && <p className="text-blue-700 mb-4 animate-pulse">Loading upcoming movies and TV shows...</p>}
-
-      {isSearching ? (
+      {/* Display Movies or TV Shows based on the selected category */}
+      {selectedCategory === "movie" || selectedCategory === "all" ? (
         <section className="w-full max-w-6xl mb-12">
-          <h2 className="text-2xl font-bold mb-4 text-blue-800">Search Results for "{query}"</h2>
-          <h3 className="text-xl font-semibold text-blue-800">Movies</h3>
-          {searchResultsMovies.length > 0 ? renderMovieList(searchResultsMovies, 0) : <p>No movies found.</p>}
-          <h3 className="text-xl font-semibold text-blue-800 mt-6">TV Shows</h3>
-          {searchResultsTVShows.length > 0 ? renderTVShowList(searchResultsTVShows, 0) : <p>No TV shows found.</p>}
+          <h2 className="text-2xl font-bold mb-4 text-blue-800">Top Rated Movies</h2>
+          {renderMovieList(topRatedMovies, topRatedMoviesSlide)}
+          <div className="flex justify-between mt-4">
+            <button onClick={() => setTopRatedMoviesSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
+              ←
+            </button>
+            <button
+              onClick={() => setTopRatedMoviesSlide((prev) => Math.min(prev + 1, Math.ceil(topRatedMovies.length / MOVIES_PER_SLIDE) - 1))}
+              className="text-xl"
+            >
+              →
+            </button>
+          </div>
+
+          <h2 className="text-2xl font-bold mb-4 text-blue-800 mt-8">Upcoming Movies</h2>
+          {renderMovieList(upcomingMovies, upcomingMoviesSlide)}
+          <div className="flex justify-between mt-4">
+            <button onClick={() => setUpcomingMoviesSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
+              ←
+            </button>
+            <button
+              onClick={() => setUpcomingMoviesSlide((prev) => Math.min(prev + 1, Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1))}
+              className="text-xl"
+            >
+              →
+            </button>
+          </div>
         </section>
-      ) : (
-        <>
-          <section className="w-full max-w-6xl mb-12">
-            <h2 className="text-2xl font-bold mb-4 text-blue-800">Top Rated Movies</h2>
-            {renderMovieList(topRatedMovies, topRatedMoviesSlide)}
-            <div className="flex justify-between mt-4">
-              <button onClick={() => setTopRatedMoviesSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
-                ←
-              </button>
-              <button
-                onClick={() => setTopRatedMoviesSlide((prev) => Math.min(prev + 1, Math.ceil(topRatedMovies.length / MOVIES_PER_SLIDE) - 1))}
-                className="text-xl"
-              >
-                →
-              </button>
-            </div>
+      ) : null}
 
-            <h2 className="text-2xl font-bold mb-4 text-blue-800 mt-8">Top Rated TV Shows</h2>
-            {renderTVShowList(topRatedTVShows, topRatedTVShowsSlide)}
-            <div className="flex justify-between mt-4">
-              <button onClick={() => setTopRatedTVShowsSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
-                ←
-              </button>
-              <button
-                onClick={() => setTopRatedTVShowsSlide((prev) => Math.min(prev + 1, Math.ceil(topRatedTVShows.length / MOVIES_PER_SLIDE) - 1))}
-                className="text-xl"
-              >
-                →
-              </button>
-            </div>
-          </section>
+      {selectedCategory === "tv" || selectedCategory === "all" ? (
+        <section className="w-full max-w-6xl mb-12">
+          <h2 className="text-2xl font-bold mb-4 text-blue-800">Top Rated TV Shows</h2>
+          {renderTVShowList(topRatedTVShows, topRatedTVShowsSlide)}
+          <div className="flex justify-between mt-4">
+            <button onClick={() => setTopRatedTVShowsSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
+              ←
+            </button>
+            <button
+              onClick={() => setTopRatedTVShowsSlide((prev) => Math.min(prev + 1, Math.ceil(topRatedTVShows.length / MOVIES_PER_SLIDE) - 1))}
+              className="text-xl"
+            >
+              →
+            </button>
+          </div>
 
-          <section className="w-full max-w-6xl mb-12">
-            <h2 className="text-2xl font-bold mb-4 text-blue-800">Upcoming Movies</h2>
-            {renderMovieList(upcomingMovies, upcomingMoviesSlide)}
-            <div className="flex justify-between mt-4">
-              <button onClick={() => setUpcomingMoviesSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
-                ←
-              </button>
-              <button
-                onClick={() => setUpcomingMoviesSlide((prev) => Math.min(prev + 1, Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1))}
-                className="text-xl"
-              >
-                →
-              </button>
-            </div>
-
-            <h2 className="text-2xl font-bold mb-4 text-blue-800 mt-8">Upcoming TV Shows</h2>
-            {renderTVShowList(upcomingTVShows, upcomingTVShowsSlide)}
-            <div className="flex justify-between mt-4">
-              <button onClick={() => setUpcomingTVShowsSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
-                ←
-              </button>
-              <button
-                onClick={() => setUpcomingTVShowsSlide((prev) => Math.min(prev + 1, Math.ceil(upcomingTVShows.length / MOVIES_PER_SLIDE) - 1))}
-                className="text-xl"
-              >
-                →
-              </button>
-            </div>
-          </section>
-        </>
-      )}
+          <h2 className="text-2xl font-bold mb-4 text-blue-800 mt-8">Upcoming TV Shows</h2>
+          {renderTVShowList(upcomingTVShows, upcomingTVShowsSlide)}
+          <div className="flex justify-between mt-4">
+            <button onClick={() => setUpcomingTVShowsSlide((prev) => Math.max(prev - 1, 0))} className="text-xl">
+              ←
+            </button>
+            <button
+              onClick={() => setUpcomingTVShowsSlide((prev) => Math.min(prev + 1, Math.ceil(upcomingTVShows.length / MOVIES_PER_SLIDE) - 1))}
+              className="text-xl"
+            >
+              →
+            </button>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
