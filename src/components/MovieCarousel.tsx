@@ -16,7 +16,7 @@ type MovieCarouselProps = {
 
 function MovieCarousel({ movies, title }: MovieCarouselProps) {
   const [scrollIndex, setScrollIndex] = useState(0);
-  const moviesPerScroll = 4;
+  const moviesPerScroll = window.innerWidth < 640 ? 2 : 4; // 2 for small screens, 4 for larger ones
   const maxScrollIndex = Math.max(movies.length - moviesPerScroll, 0);
 
   const scrollNext = () => {
@@ -35,16 +35,16 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
         {scrollIndex > 0 && (
           <button
             onClick={scrollPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md z-10 opacity-70 group-hover:opacity-100 transition-opacity"
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-md z-10 opacity-70 group-hover:opacity-100 transition-opacity"
             aria-label="Previous movies"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={24} />
           </button>
         )}
 
         <div className="relative overflow-hidden">
           <div
-            className="flex transition-transform duration-300"
+            className="flex transition-transform duration-300 ease-in-out"
             style={{
               transform: `translateX(-${scrollIndex * (100 / moviesPerScroll)}%)`,
             }}
@@ -52,7 +52,7 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
             {movies.map((movie) => (
               <div
                 key={movie.id}
-                className="flex-shrink-0 w-1/4 px-2"
+                className="flex-shrink-0 w-1/2 sm:w-1/3 lg:w-1/4 px-2"
               >
                 <Link
                   to={`/movie/${movie.id}`}
@@ -86,10 +86,10 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
         {scrollIndex < maxScrollIndex && (
           <button
             onClick={scrollNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md z-10 opacity-70 group-hover:opacity-100 transition-opacity"
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-md z-10 opacity-70 group-hover:opacity-100 transition-opacity"
             aria-label="Next movies"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={24} />
           </button>
         )}
       </div>

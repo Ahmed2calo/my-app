@@ -12,17 +12,26 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <button
           onClick={handleGoHome}
-          className="text-2xl font-bold text-white hover:text-teal-300 transition-all"
+          className="text-3xl font-extrabold text-white hover:text-teal-300 transition-all transform hover:scale-110"
         >
           🎬 Movie App
         </button>
 
-        <div className="space-x-4">
+        <div className="hidden md:flex space-x-6">
           <button
             onClick={handleGoHome}
-            className="text-white hover:text-teal-300 transition-all"
+            className="text-white text-lg font-semibold hover:text-teal-300 transition-all transform hover:scale-110"
           >
             Home
+          </button>
+        </div>
+
+        <div className="md:hidden">
+          <button
+            className="text-white text-2xl hover:text-teal-300 transition-all"
+            onClick={handleGoHome}
+          >
+            <i className="fas fa-bars"></i>
           </button>
         </div>
       </div>

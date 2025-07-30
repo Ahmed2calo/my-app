@@ -8,10 +8,10 @@ const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 
 type MovieDetailsType = {
   title: string;
-  name?: string;  // TV Series name
+  name?: string;  
   poster_path: string | null;
   overview: string;
-  media_type: string; // movie or tv
+  media_type: string; 
 };
 
 type CastType = {
@@ -60,7 +60,7 @@ function ReviewCard({ review }: { review: ReviewType }) {
 }
 
 function MovieDetails() {
-  const { id, media_type } = useParams();  // Get media_type from route
+  const { id, media_type } = useParams();  
   const [movie, setMovie] = useState<MovieDetailsType | null>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [cast, setCast] = useState<CastType[]>([]);
@@ -71,7 +71,7 @@ function MovieDetails() {
   useEffect(() => {
     async function fetchDetails() {
       try {
-        // Dynamically fetch movie or TV show based on the media_type
+        
         const currentMediaType = media_type || (id?.startsWith("movie") ? "movie" : "tv");
 
         const [detailsRes, videosRes, creditsRes, reviewsRes, recRes] = await Promise.all([
@@ -125,7 +125,6 @@ function MovieDetails() {
         {movie.overview}
       </p>
 
-      {/* Trailer */}
       {trailerKey && (
         <div className="mb-10 max-w-3xl mx-auto">
           <h2 className="text-2xl font-semibold mb-4">🎬 Trailer</h2>
@@ -140,7 +139,6 @@ function MovieDetails() {
         </div>
       )}
 
-      {/* Cast */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4">👥 Cast</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -170,7 +168,6 @@ function MovieDetails() {
         </div>
       </div>
 
-      {/* Recommendations */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4">🎥 Recommendations</h2>
         {recommendations.length === 0 ? (
@@ -180,7 +177,7 @@ function MovieDetails() {
             {recommendations.map((rec) => (
               <Link
                 key={rec.id}
-                to={`/${rec.title ? 'movie' : 'tv'}/${rec.id}`}  // Dynamic path based on media_type
+                to={`/${rec.title ? 'movie' : 'tv'}/${rec.id}`}  
                 className="block bg-gray-800 rounded-lg shadow overflow-hidden text-center hover:scale-105 transition-transform"
               >
                 {rec.poster_path ? (
@@ -203,7 +200,6 @@ function MovieDetails() {
         )}
       </div>
 
-      {/* Reviews */}
       <div className="mb-10 max-w-3xl mx-auto">
         <h2 className="text-2xl font-semibold mb-4 text-white">📝 Reviews</h2>
         {reviews.length === 0 ? (

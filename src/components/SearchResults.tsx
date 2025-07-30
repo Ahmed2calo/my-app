@@ -25,18 +25,17 @@ type TVShow = {
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q");
-  const [results, setResults] = useState<(Movie | TVShow)[]>([]); // Combined results (movies and TV shows)
+  const [results, setResults] = useState<(Movie | TVShow)[]>([]); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (query) {
       setLoading(true);
-      setError(""); // Reset error on new search
+      setError(""); 
 
       const fetchSearchResults = async () => {
         try {
-          // Fetching movies and TV shows based on the query
           const movieEndpoint = `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1`;
           const tvShowEndpoint = `${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1`;
 
@@ -67,16 +66,14 @@ const SearchResults = () => {
     }
   }, [query]);
 
-  // Helper function to shuffle an array randomly
   const shuffleArray = (array: any[]) => {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      [array[i], array[j]] = [array[j], array[i]]; 
     }
     return array;
   };
 
-  // Render list of items (both movies and TV shows)
   const renderResults = () => {
     return results.map((item) => {
       if (item.type === "movie") {
@@ -129,7 +126,6 @@ const SearchResults = () => {
     <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 p-6">
       <h1 className="text-2xl font-bold mb-4">Search Results for "{query}"</h1>
 
-      {/* Search Bar */}
       <div className="w-full max-w-md mb-6">
         <input
           type="text"
@@ -140,14 +136,12 @@ const SearchResults = () => {
         />
       </div>
 
-      {/* Loading State */}
       {loading ? (
         <p className="text-blue-700">Loading...</p>
       ) : error ? (
         <p className="text-red-600">{error}</p>
       ) : (
         <div>
-          {/* Display Results */}
           {results.length > 0 ? (
             <div className="flex flex-wrap gap-6">
               {renderResults()}

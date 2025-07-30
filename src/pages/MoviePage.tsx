@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
@@ -29,11 +30,12 @@ function MoviePage() {
   const [upcomingMovies, setUpcomingMovies] = useState<Movie[]>([]);
   const [upcomingTVShows, setUpcomingTVShows] = useState<TVShow[]>([]);
   const [searchResults, setSearchResults] = useState<(Movie | TVShow)[]>([]);
-  const [loading, setLoading] = useState({ 
-    topRated: false, 
-    upcoming: false, 
-    search: false 
+  const [loading, setLoading] = useState({
+    topRated: false,
+    upcoming: false,
+    search: false,
   });
+
   const [topRatedMoviesSlide, setTopRatedMoviesSlide] = useState(0);
   const [topRatedTVShowsSlide, setTopRatedTVShowsSlide] = useState(0);
   const [upcomingMoviesSlide, setUpcomingMoviesSlide] = useState(0);
@@ -41,8 +43,11 @@ function MoviePage() {
 
   const MOVIES_PER_SLIDE = 4;
 
-  // Reusable function to fetch data
-  const fetchData = async (endpoint: string, setState: React.Dispatch<React.SetStateAction<any[]>>, key: string) => {
+  const fetchData = async (
+    endpoint: string,
+    setState: React.Dispatch<React.SetStateAction<any[]>>,
+    key: string
+  ) => {
     setLoading((prev) => ({ ...prev, [key]: true }));
     try {
       const result = await axios.get(endpoint);
@@ -58,16 +63,32 @@ function MoviePage() {
   const fetchTopRated = () => {
     setLoading({ ...loading, topRated: true });
     Promise.all([
-      fetchData(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=en-US&page=1`, setTopRatedMovies, "topRated"),
-      fetchData(`${TMDB_BASE_URL}/tv/top_rated?api_key=${TMDB_API_KEY}&language=en-US&page=1`, setTopRatedTVShows, "topRated"),
+      fetchData(
+        `${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=en-US&page=1`,
+        setTopRatedMovies,
+        "topRated"
+      ),
+      fetchData(
+        `${TMDB_BASE_URL}/tv/top_rated?api_key=${TMDB_API_KEY}&language=en-US&page=1`,
+        setTopRatedTVShows,
+        "topRated"
+      ),
     ]);
   };
 
   const fetchUpcoming = () => {
     setLoading({ ...loading, upcoming: true });
     Promise.all([
-      fetchData(`${TMDB_BASE_URL}/movie/upcoming?api_key=${TMDB_API_KEY}&language=en-US&page=1`, setUpcomingMovies, "upcoming"),
-      fetchData(`${TMDB_BASE_URL}/tv/on_the_air?api_key=${TMDB_API_KEY}&language=en-US&page=1`, setUpcomingTVShows, "upcoming"),
+      fetchData(
+        `${TMDB_BASE_URL}/movie/upcoming?api_key=${TMDB_API_KEY}&language=en-US&page=1`,
+        setUpcomingMovies,
+        "upcoming"
+      ),
+      fetchData(
+        `${TMDB_BASE_URL}/tv/on_the_air?api_key=${TMDB_API_KEY}&language=en-US&page=1`,
+        setUpcomingTVShows,
+        "upcoming"
+      ),
     ]);
   };
 
@@ -75,11 +96,6 @@ function MoviePage() {
     fetchTopRated();
     fetchUpcoming();
   }, []);
-
-  // Helper function to slice the list for carousel navigation
-  const getCarouselItems = (items: any[], slideIndex: number) => {
-    return items.slice(slideIndex * MOVIES_PER_SLIDE, (slideIndex + 1) * MOVIES_PER_SLIDE);
-  };
 
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -110,11 +126,15 @@ function MoviePage() {
     }
   };
 
+  const getCarouselItems = (items: any[], slideIndex: number) => {
+    return items.slice(slideIndex * MOVIES_PER_SLIDE, (slideIndex + 1) * MOVIES_PER_SLIDE);
+  };
+
   const renderMovieList = (movies: Movie[], slideIndex: number) => (
     <div className="flex overflow-x-auto space-x-6">
       {getCarouselItems(movies, slideIndex).map((movie) => (
         <Link to={`/movie/${movie.id}`} key={movie.id}>
-          <div className="bg-white rounded-lg shadow-lg p-4 text-center hover:shadow-xl h-full flex flex-col">
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-2xl transition-all duration-300 ease-in-out">
             {movie.poster_path ? (
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -138,7 +158,7 @@ function MoviePage() {
     <div className="flex overflow-x-auto space-x-6">
       {getCarouselItems(tvShows, slideIndex).map((tvShow) => (
         <Link to={`/tv/${tvShow.id}`} key={tvShow.id}>
-          <div className="bg-white rounded-lg shadow-lg p-4 text-center hover:shadow-xl h-full flex flex-col">
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-2xl transition-all duration-300 ease-in-out">
             {tvShow.poster_path ? (
               <img
                 src={`https://image.tmdb.org/t/p/w500${tvShow.poster_path}`}
@@ -168,11 +188,8 @@ function MoviePage() {
         <h2 className="text-2xl font-bold mb-4 text-blue-800">Search Results</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {searchResults.map((item) => (
-            <Link 
-              to={`/${'title' in item ? 'movie' : 'tv'}/${item.id}`} 
-              key={item.id}
-            >
-              <div className="bg-white rounded-lg shadow-lg p-4 text-center hover:shadow-xl h-full flex flex-col">
+            <Link to={`/${'title' in item ? 'movie' : 'tv'}/${item.id}`} key={item.id}>
+              <div className="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-2xl transition-all duration-300 ease-in-out">
                 {item.poster_path ? (
                   <img
                     src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
@@ -202,7 +219,6 @@ function MoviePage() {
     <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 flex flex-col items-center p-6">
       <Navbar />
 
-      {/* Search Bar Section */}
       <div className="w-full max-w-md mb-6">
         <input
           type="text"
@@ -210,42 +226,39 @@ function MoviePage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-4 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
         />
         <button
           onClick={handleSearch}
-          className="w-full mt-2 bg-blue-500 text-white py-3 rounded-lg shadow-md hover:bg-blue-600 transition-all"
+          className="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300"
         >
           Search
         </button>
       </div>
 
-      {/* Category Buttons Section */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-6 mb-8">
         <button
           onClick={() => setSelectedCategory("movie")}
-          className={`px-4 py-2 rounded ${selectedCategory === "movie" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+          className={`px-6 py-3 rounded-lg text-lg ${selectedCategory === "movie" ? "bg-blue-600 text-white" : "bg-gray-300"}`}
         >
           Movies
         </button>
         <button
           onClick={() => setSelectedCategory("tv")}
-          className={`px-4 py-2 rounded ${selectedCategory === "tv" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+          className={`px-6 py-3 rounded-lg text-lg ${selectedCategory === "tv" ? "bg-blue-600 text-white" : "bg-gray-300"}`}
         >
           TV Shows
         </button>
         <button
           onClick={() => setSelectedCategory("all")}
-          className={`px-4 py-2 rounded ${selectedCategory === "all" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+          className={`px-6 py-3 rounded-lg text-lg ${selectedCategory === "all" ? "bg-blue-600 text-white" : "bg-gray-300"}`}
         >
           All
         </button>
       </div>
 
-      {/* Display search results if there's a query */}
       {query && renderSearchResults()}
 
-      {/* Only show other sections if there's no search query */}
       {!query && (
         <>
           {selectedCategory === "movie" || selectedCategory === "all" ? (
@@ -255,36 +268,17 @@ function MoviePage() {
               <div className="flex justify-between mt-4">
                 <button 
                   onClick={() => setTopRatedMoviesSlide((prev) => Math.max(prev - 1, 0))} 
-                  className="text-xl"
+                  className="text-xl text-blue-800"
                   disabled={topRatedMoviesSlide === 0}
                 >
-                  ←
+                  <ChevronLeft size={24} />
                 </button>
                 <button
                   onClick={() => setTopRatedMoviesSlide((prev) => Math.min(prev + 1, Math.ceil(topRatedMovies.length / MOVIES_PER_SLIDE) - 1))}
-                  className="text-xl"
+                  className="text-xl text-blue-800"
                   disabled={topRatedMoviesSlide >= Math.ceil(topRatedMovies.length / MOVIES_PER_SLIDE) - 1}
                 >
-                  →
-                </button>
-              </div>
-
-              <h2 className="text-2xl font-bold mb-4 text-blue-800 mt-8">Upcoming Movies</h2>
-              {renderMovieList(upcomingMovies, upcomingMoviesSlide)}
-              <div className="flex justify-between mt-4">
-                <button 
-                  onClick={() => setUpcomingMoviesSlide((prev) => Math.max(prev - 1, 0))} 
-                  className="text-xl"
-                  disabled={upcomingMoviesSlide === 0}
-                >
-                  ←
-                </button>
-                <button
-                  onClick={() => setUpcomingMoviesSlide((prev) => Math.min(prev + 1, Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1))}
-                  className="text-xl"
-                  disabled={upcomingMoviesSlide >= Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1}
-                >
-                  →
+                  <ChevronRight size={24} />
                 </button>
               </div>
             </section>
@@ -297,36 +291,63 @@ function MoviePage() {
               <div className="flex justify-between mt-4">
                 <button 
                   onClick={() => setTopRatedTVShowsSlide((prev) => Math.max(prev - 1, 0))} 
-                  className="text-xl"
+                  className="text-xl text-blue-800"
                   disabled={topRatedTVShowsSlide === 0}
                 >
-                  ←
+                  <ChevronLeft size={24} />
                 </button>
                 <button
                   onClick={() => setTopRatedTVShowsSlide((prev) => Math.min(prev + 1, Math.ceil(topRatedTVShows.length / MOVIES_PER_SLIDE) - 1))}
-                  className="text-xl"
+                  className="text-xl text-blue-800"
                   disabled={topRatedTVShowsSlide >= Math.ceil(topRatedTVShows.length / MOVIES_PER_SLIDE) - 1}
                 >
-                  →
+                  <ChevronRight size={24} />
                 </button>
               </div>
+            </section>
+          ) : null}
 
-              <h2 className="text-2xl font-bold mb-4 text-blue-800 mt-8">Upcoming TV Shows</h2>
+          {selectedCategory === "movie" || selectedCategory === "all" ? (
+            <section className="w-full max-w-6xl mb-12">
+              <h2 className="text-2xl font-bold mb-4 text-blue-800">Upcoming Movies</h2>
+              {renderMovieList(upcomingMovies, upcomingMoviesSlide)}
+              <div className="flex justify-between mt-4">
+                <button 
+                  onClick={() => setUpcomingMoviesSlide((prev) => Math.max(prev - 1, 0))} 
+                  className="text-xl text-blue-800"
+                  disabled={upcomingMoviesSlide === 0}
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  onClick={() => setUpcomingMoviesSlide((prev) => Math.min(prev + 1, Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1))}
+                  className="text-xl text-blue-800"
+                  disabled={upcomingMoviesSlide >= Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1}
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+            </section>
+          ) : null}
+
+          {selectedCategory === "tv" || selectedCategory === "all" ? (
+            <section className="w-full max-w-6xl mb-12">
+              <h2 className="text-2xl font-bold mb-4 text-blue-800">Upcoming TV Shows</h2>
               {renderTVShowList(upcomingTVShows, upcomingTVShowsSlide)}
               <div className="flex justify-between mt-4">
                 <button 
                   onClick={() => setUpcomingTVShowsSlide((prev) => Math.max(prev - 1, 0))} 
-                  className="text-xl"
+                  className="text-xl text-blue-800"
                   disabled={upcomingTVShowsSlide === 0}
                 >
-                  ←
+                  <ChevronLeft size={24} />
                 </button>
                 <button
                   onClick={() => setUpcomingTVShowsSlide((prev) => Math.min(prev + 1, Math.ceil(upcomingTVShows.length / MOVIES_PER_SLIDE) - 1))}
-                  className="text-xl"
+                  className="text-xl text-blue-800"
                   disabled={upcomingTVShowsSlide >= Math.ceil(upcomingTVShows.length / MOVIES_PER_SLIDE) - 1}
                 >
-                  →
+                  <ChevronRight size={24} />
                 </button>
               </div>
             </section>
