@@ -29,13 +29,13 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
 
   return (
     <section className="w-full max-w-6xl mx-auto mb-8 px-4 relative">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">{title}</h2>
+      <h2 className="text-2xl font-semibold text-white mb-4">{title}</h2>
 
       <div className="relative group">
         {scrollIndex > 0 && (
           <button
             onClick={scrollPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-md z-10 opacity-70 group-hover:opacity-100 transition-opacity"
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-black text-white p-3 rounded-full shadow-lg opacity-70 hover:opacity-100 transition-opacity z-10"
             aria-label="Previous movies"
           >
             <ChevronLeft size={24} />
@@ -44,7 +44,7 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
 
         <div className="relative overflow-hidden">
           <div
-            className="flex transition-transform duration-300 ease-in-out"
+            className="flex transition-all duration-500 ease-out"
             style={{
               transform: `translateX(-${scrollIndex * (100 / moviesPerScroll)}%)`,
             }}
@@ -56,9 +56,9 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
               >
                 <Link
                   to={`/movie/${movie.id}`}
-                  className="block hover:scale-[1.05] transition-transform duration-200"
+                  className="block hover:scale-[1.05] transition-transform duration-300"
                 >
-                  <div className="bg-white rounded-md shadow-sm overflow-hidden hover:shadow-lg transform hover:scale-105 transition-transform">
+                  <div className="bg-white rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transform hover:scale-105 transition-all">
                     {movie.poster_path ? (
                       <img
                         src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
@@ -66,12 +66,12 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
                         className="w-full h-auto aspect-[2/3] object-cover"
                       />
                     ) : (
-                      <div className="bg-gray-200 aspect-[2/3] flex items-center justify-center rounded-md">
+                      <div className="bg-gray-200 aspect-[2/3] flex items-center justify-center rounded-lg">
                         <span className="text-xs text-gray-500">No Image</span>
                       </div>
                     )}
                     <div className="p-2">
-                      <h3 className="font-medium text-sm line-clamp-1">{movie.title}</h3>
+                      <h3 className="font-medium text-sm text-gray-800 line-clamp-1">{movie.title}</h3>
                       <p className="text-xs text-gray-500 mt-1">
                         {movie.release_date?.substring(0, 4) || "N/A"}
                       </p>
@@ -86,7 +86,7 @@ function MovieCarousel({ movies, title }: MovieCarouselProps) {
         {scrollIndex < maxScrollIndex && (
           <button
             onClick={scrollNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-md z-10 opacity-70 group-hover:opacity-100 transition-opacity"
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-black text-white p-3 rounded-full shadow-lg opacity-70 hover:opacity-100 transition-opacity z-10"
             aria-label="Next movies"
           >
             <ChevronRight size={24} />

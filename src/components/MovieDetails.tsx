@@ -8,10 +8,10 @@ const IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 
 type MovieDetailsType = {
   title: string;
-  name?: string;  
+  name?: string;
   poster_path: string | null;
   overview: string;
-  media_type: string; 
+  media_type: string;
 };
 
 type CastType = {
@@ -29,8 +29,8 @@ type ReviewType = {
 
 type RecommendationType = {
   id: number;
-  title: string;
-  name: string;
+  title?: string;
+  name?: string;
   poster_path: string | null;
 };
 
@@ -60,7 +60,7 @@ function ReviewCard({ review }: { review: ReviewType }) {
 }
 
 function MovieDetails() {
-  const { id, media_type } = useParams();  
+  const { id, media_type } = useParams();
   const [movie, setMovie] = useState<MovieDetailsType | null>(null);
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [cast, setCast] = useState<CastType[]>([]);
@@ -71,7 +71,6 @@ function MovieDetails() {
   useEffect(() => {
     async function fetchDetails() {
       try {
-        
         const currentMediaType = media_type || (id?.startsWith("movie") ? "movie" : "tv");
 
         const [detailsRes, videosRes, creditsRes, reviewsRes, recRes] = await Promise.all([
@@ -174,28 +173,31 @@ function MovieDetails() {
           <p className="text-gray-400">No recommendations available.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {recommendations.map((rec) => (
-              <Link
-                key={rec.id}
-                to={`/${rec.title ? 'movie' : 'tv'}/${rec.id}`}  
-                className="block bg-gray-800 rounded-lg shadow overflow-hidden text-center hover:scale-105 transition-transform"
-              >
-                {rec.poster_path ? (
-                  <img
-                    src={`${IMAGE_URL}${rec.poster_path}`}
-                    alt={rec.title || rec.name}
-                    className="w-full h-48 object-cover"
-                  />
-                ) : (
-                  <div className="bg-gray-700 h-48 flex items-center justify-center text-gray-400">
-                    No Image
+            {recommendations.map((rec) => {
+              const mediaType = rec.title ? "movie" : "tv";
+              return (
+                <Link
+                  key={rec.id}
+                  to={`/${mediaType}/${rec.id}`} // Correcting the link structure
+                  className="block bg-gray-800 rounded-lg shadow overflow-hidden text-center hover:scale-105 transition-transform"
+                >
+                  {rec.poster_path ? (
+                    <img
+                      src={`${IMAGE_URL}${rec.poster_path}`}
+                      alt={rec.title || rec.name}
+                      className="w-full h-48 object-cover"
+                    />
+                  ) : (
+                    <div className="bg-gray-700 h-48 flex items-center justify-center text-gray-400">
+                      No Image
+                    </div>
+                  )}
+                  <div className="p-2">
+                    <p className="text-sm font-semibold truncate">{rec.title || rec.name}</p>
                   </div>
-                )}
-                <div className="p-2">
-                  <p className="text-sm font-semibold truncate">{rec.title || rec.name}</p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

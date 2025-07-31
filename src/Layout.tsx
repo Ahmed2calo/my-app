@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 function Layout() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 text-white">
+    <div className="min-h-screen bg-black text-white">
       <Navbar />
       <SearchBar />
       
