@@ -12,6 +12,7 @@ type Movie = {
   title: string;
   poster_path: string | null;
   release_date: string;
+  vote_average: number;
 };
 
 type TVShow = {
@@ -19,13 +20,12 @@ type TVShow = {
   name: string;
   poster_path: string | null;
   first_air_date: string;
+  vote_average: number;
 };
 
 function MoviePage() {
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<
-    "movie" | "tv" | "all"
-  >("all");
+  const [selectedCategory, setSelectedCategory] = useState<"movie" | "tv" | "all">("all");
   const [error, setError] = useState("");
   const [topRatedMovies, setTopRatedMovies] = useState<Movie[]>([]);
   const [topRatedTVShows, setTopRatedTVShows] = useState<TVShow[]>([]);
@@ -54,6 +54,7 @@ function MoviePage() {
     try {
       const result = await axios.get(endpoint);
       setState(result.data.results);
+      console.log(`${key} Data:`, result.data.results);
     } catch (err) {
       console.error(err);
       setError(`Failed to fetch ${key}.`);
@@ -141,12 +142,14 @@ function MoviePage() {
     );
   };
 
-  // In the Movie List Rendering Section
-  // Render Movie List
   const renderMovieList = (movies: Movie[], slideIndex: number) => (
     <div className="flex overflow-x-auto space-x-6">
       {getCarouselItems(movies, slideIndex).map((movie) => (
-        <Link to={`/movie/${movie.id}`} key={movie.id}>
+        <Link
+          to={`/movie/${movie.id}`}
+          state={{ movieData: movie }} 
+          key={movie.id}
+        >
           <div className="bg-white rounded-lg shadow-lg p-4 text-center hover:shadow-2xl transition-all duration-300 ease-in-out w-72 h-120">
             {movie.poster_path ? (
               <img
@@ -163,11 +166,9 @@ function MoviePage() {
               {movie.title}
             </h3>
             <p className="font-semibold text-lg mt-2 text-gray-800 truncate">
-              time released: {movie.release_date}
+              Time Released: {movie.release_date}
             </p>
-
-            {/* Rating and Release Date */}
-            <div className="flex justify-between items-center mt-2">
+            <div className="flex justify-center items-center mt-2">
               <div className="text-sm text-yellow-500 font-semibold">
                 Rating:{" "}
                 {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
@@ -179,11 +180,14 @@ function MoviePage() {
     </div>
   );
 
-  // Render TV Show List
   const renderTVShowList = (tvShows: TVShow[], slideIndex: number) => (
     <div className="flex overflow-x-auto space-x-6">
       {getCarouselItems(tvShows, slideIndex).map((tvShow) => (
-        <Link to={`/tv/${tvShow.id}`} key={tvShow.id}>
+        <Link
+          to={`/tv/${tvShow.id}`}
+          state={{ tvShowData: tvShow }} 
+          key={tvShow.id}
+        >
           <div className="bg-white rounded-lg shadow-lg p-4 text-center hover:shadow-2xl transition-all duration-300 ease-in-out w-72 h-120">
             {tvShow.poster_path ? (
               <img
@@ -200,12 +204,10 @@ function MoviePage() {
               {tvShow.name}
             </h3>
             <p className="font-semibold text-lg mt-2 text-gray-800 truncate">
-              time released: {tvShow.first_air_date}
+              Time Released: {tvShow.first_air_date}
             </p>
-
-            {/* Rating and Release Date */}
-            <div className="flex justify-between items-center mt-2">
-              <div className="text-sm text-yellow-500 font-semibold truncate">
+            <div className="flex justify-center items-center mt-2">
+              <div className="text-sm text-yellow-500 font-semibold">
                 Rating:{" "}
                 {tvShow.vote_average ? tvShow.vote_average.toFixed(1) : "N/A"}
               </div>
@@ -233,6 +235,7 @@ function MoviePage() {
           {searchResults.map((item) => (
             <Link
               to={`/${"title" in item ? "movie" : "tv"}/${item.id}`}
+              state={{ itemData: item }}
               key={item.id}
             >
               <div className="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-2xl transition-all duration-300 ease-in-out">
@@ -263,6 +266,47 @@ function MoviePage() {
     );
   };
 
+  const handleSlideChange = (direction: "prev" | "next", type: string) => {
+    const totalSlides =
+      type === "topRatedMovies"
+        ? Math.ceil(topRatedMovies.length / MOVIES_PER_SLIDE)
+        : type === "topRatedTVShows"
+        ? Math.ceil(topRatedTVShows.length / MOVIES_PER_SLIDE)
+        : type === "upcomingMovies"
+        ? Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE)
+        : Math.ceil(upcomingTVShows.length / MOVIES_PER_SLIDE);
+
+    if (direction === "prev") {
+      if (type === "topRatedMovies") {
+        setTopRatedMoviesSlide((prev) => Math.max(prev - 1, 0));
+      } else if (type === "topRatedTVShows") {
+        setTopRatedTVShowsSlide((prev) => Math.max(prev - 1, 0));
+      } else if (type === "upcomingMovies") {
+        setUpcomingMoviesSlide((prev) => Math.max(prev - 1, 0));
+      } else if (type === "upcomingTVShows") {
+        setUpcomingTVShowsSlide((prev) => Math.max(prev - 1, 0));
+      }
+    } else {
+      if (type === "topRatedMovies") {
+        setTopRatedMoviesSlide((prev) =>
+          Math.min(prev + 1, totalSlides - 1)
+        );
+      } else if (type === "topRatedTVShows") {
+        setTopRatedTVShowsSlide((prev) =>
+          Math.min(prev + 1, totalSlides - 1)
+        );
+      } else if (type === "upcomingMovies") {
+        setUpcomingMoviesSlide((prev) =>
+          Math.min(prev + 1, totalSlides - 1)
+        );
+      } else if (type === "upcomingTVShows") {
+        setUpcomingTVShowsSlide((prev) =>
+          Math.min(prev + 1, totalSlides - 1)
+        );
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center p-6">
       <Navbar />
@@ -287,9 +331,7 @@ function MoviePage() {
         <div
           onClick={() => setSelectedCategory("all")}
           className={`px-6 py-3 rounded-lg text-lg ${
-            selectedCategory === "all"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-300"
+            selectedCategory === "all" ? "bg-blue-600 text-white" : "bg-gray-300"
           } cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300`}
         >
           All
@@ -298,9 +340,7 @@ function MoviePage() {
         <div
           onClick={() => setSelectedCategory("movie")}
           className={`px-6 py-3 rounded-lg text-lg ${
-            selectedCategory === "movie"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-300"
+            selectedCategory === "movie" ? "bg-blue-600 text-white" : "bg-gray-300"
           } cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300`}
         >
           Movies
@@ -327,28 +367,19 @@ function MoviePage() {
               {renderMovieList(topRatedMovies, topRatedMoviesSlide)}
               <div className="flex justify-between mt-4">
                 <button
-                  onClick={() =>
-                    setTopRatedMoviesSlide((prev) => Math.max(prev - 1, 0))
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("prev", "topRatedMovies")}
                   disabled={topRatedMoviesSlide === 0}
+                  className="text-xl text-blue-800"
                 >
                   <ChevronLeft size={24} />
                 </button>
                 <button
-                  onClick={() =>
-                    setTopRatedMoviesSlide((prev) =>
-                      Math.min(
-                        prev + 1,
-                        Math.ceil(topRatedMovies.length / MOVIES_PER_SLIDE) - 1
-                      )
-                    )
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("next", "topRatedMovies")}
                   disabled={
                     topRatedMoviesSlide >=
                     Math.ceil(topRatedMovies.length / MOVIES_PER_SLIDE) - 1
                   }
+                  className="text-xl text-blue-800"
                 >
                   <ChevronRight size={24} />
                 </button>
@@ -364,28 +395,19 @@ function MoviePage() {
               {renderTVShowList(topRatedTVShows, topRatedTVShowsSlide)}
               <div className="flex justify-between mt-4">
                 <button
-                  onClick={() =>
-                    setTopRatedTVShowsSlide((prev) => Math.max(prev - 1, 0))
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("prev", "topRatedTVShows")}
                   disabled={topRatedTVShowsSlide === 0}
+                  className="text-xl text-blue-800"
                 >
                   <ChevronLeft size={24} />
                 </button>
                 <button
-                  onClick={() =>
-                    setTopRatedTVShowsSlide((prev) =>
-                      Math.min(
-                        prev + 1,
-                        Math.ceil(topRatedTVShows.length / MOVIES_PER_SLIDE) - 1
-                      )
-                    )
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("next", "topRatedTVShows")}
                   disabled={
                     topRatedTVShowsSlide >=
                     Math.ceil(topRatedTVShows.length / MOVIES_PER_SLIDE) - 1
                   }
+                  className="text-xl text-blue-800"
                 >
                   <ChevronRight size={24} />
                 </button>
@@ -401,28 +423,19 @@ function MoviePage() {
               {renderMovieList(upcomingMovies, upcomingMoviesSlide)}
               <div className="flex justify-between mt-4">
                 <button
-                  onClick={() =>
-                    setUpcomingMoviesSlide((prev) => Math.max(prev - 1, 0))
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("prev", "upcomingMovies")}
                   disabled={upcomingMoviesSlide === 0}
+                  className="text-xl text-blue-800"
                 >
                   <ChevronLeft size={24} />
                 </button>
                 <button
-                  onClick={() =>
-                    setUpcomingMoviesSlide((prev) =>
-                      Math.min(
-                        prev + 1,
-                        Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1
-                      )
-                    )
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("next", "upcomingMovies")}
                   disabled={
                     upcomingMoviesSlide >=
                     Math.ceil(upcomingMovies.length / MOVIES_PER_SLIDE) - 1
                   }
+                  className="text-xl text-blue-800"
                 >
                   <ChevronRight size={24} />
                 </button>
@@ -438,28 +451,19 @@ function MoviePage() {
               {renderTVShowList(upcomingTVShows, upcomingTVShowsSlide)}
               <div className="flex justify-between mt-4">
                 <button
-                  onClick={() =>
-                    setUpcomingTVShowsSlide((prev) => Math.max(prev - 1, 0))
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("prev", "upcomingTVShows")}
                   disabled={upcomingTVShowsSlide === 0}
+                  className="text-xl text-blue-800"
                 >
                   <ChevronLeft size={24} />
                 </button>
                 <button
-                  onClick={() =>
-                    setUpcomingTVShowsSlide((prev) =>
-                      Math.min(
-                        prev + 1,
-                        Math.ceil(upcomingTVShows.length / MOVIES_PER_SLIDE) - 1
-                      )
-                    )
-                  }
-                  className="text-xl text-blue-800"
+                  onClick={() => handleSlideChange("next", "upcomingTVShows")}
                   disabled={
                     upcomingTVShowsSlide >=
                     Math.ceil(upcomingTVShows.length / MOVIES_PER_SLIDE) - 1
                   }
+                  className="text-xl text-blue-800"
                 >
                   <ChevronRight size={24} />
                 </button>
